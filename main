@@ -1,0 +1,129 @@
+import turtle
+import random
+import math
+
+def main():
+    n = int(input("How many n red M+Ms (alternatively, how many n green M+Ms)? "))
+    pool_drawing()
+    counter = 1
+    wins = [] #empty list to put the winning sequences in
+    patrick_pool(n, counter, wins)
+
+def pool_drawing():
+    turtle.speed(8)
+    turtle.up()
+    turtle.setpos(-200,100)
+    turtle.down()
+    turtle.color('blue')
+    turtle.begin_fill()
+    for i in range(4):
+        if i%2 == 0: #if its even
+            turtle.forward(400)
+        else:
+            turtle.forward(200)
+        turtle.left(90)
+    turtle.end_fill()
+    turtle.up()
+    turtle.left(90)
+    turtle.setpos(0,100)
+    turtle.speed(3)
+    turtle.down()
+    turtle.register_shape("star", ((-10,-10), (0,10), (10,-10), (-10,4), (10,4),(-10,-10)))
+    turtle.color("pink")
+    turtle.shape("star")
+
+
+def patrick_pool(n, counter, wins): #n is how many sequences
+    catalan = int((math.factorial(2*n) / (math.factorial(n+1) * math.factorial(n)))) #finds the Catalan number of number n
+    a1 = ["R" if i%2 else "G" for i in range(2*n)] # list for all possible sequences of 2n
+    random.shuffle(a1)
+    y = 0
+    turtle.speed(1)
+    turtle.width(10)
+    for i in range(len(a1)):
+        if a1[i] == "R": #red M+M goes back
+            turtle.pencolor("red")
+            turtle.back(50) #by 20
+            y -= 1
+        if a1[i] == "G" and y == 0:
+            if counter == 1:
+                print("Sorry, Patrick fell in the pool", counter, "time")
+            else:
+                print("Sorry, Patrick fell in the pool", counter, "times")
+            print("Probability =", str((1-(1/(n+1)))*100)[:4], end="")
+            print("%")
+            print()
+            return patrick_pool(n, counter+1, wins)
+        elif a1[i] == "G": #green M+M goes forward
+            turtle.pencolor("green")
+            turtle.forward(50)
+            y += 1
+    if y <= 0: #when patrick does not fall into the pool
+        if a1 in wins:
+            if counter == 1:
+                print("Congrats! Patrick did not fall into the pool after", counter, "attempt")
+            else:
+                print("Congrats! Patrick did not fall into the pool after", counter, "attempts")
+            print("Unfortunately, you have already found the sequence", end=" ")
+            for i in range(len(a1)):
+                print(a1[i], end="")
+            print()
+            print()
+            if catalan-len(wins) == 1:
+                print("There is still", catalan-len(wins), "other possibility")
+            else:
+                print("There are still", catalan-len(wins), "other possibilities")
+        else:
+            wins.append(a1) #since this sequence "won"
+            if counter == 1:
+                print("Congrats! Patrick did not fall into the pool after", counter, "attempt")
+            else:
+                print("Congrats! Patrick did not fall into the pool after", counter, "attempts")
+            print("The winning sequence was", end=" ")
+            for i in range(len(a1)):
+                print(a1[i], end="")
+            print()
+            print("Probability =", str((1/(n+1))*100)[:4], end="")
+            print("%")
+            print()
+            if catalan-len(wins) == 1:
+                print("There is", catalan-len(wins), "other possibility")
+            else:
+                print("There are", catalan-len(wins), "other possibilities")
+        if catalan-len(wins) == 0: #found all the possibilities
+            print("You found all", catalan, "possibilities")
+            inp1 = int(input("Would you like to try a different number? Press 0 to quit, 1 for yes, or 2 to view all winning sequences "))
+            print()
+            if inp1 == 1:
+                turtle.clearscreen()
+                main()
+            if inp1 == 2:
+                for i in range(len(wins)):
+                    for j in range(len(wins[i])):
+                        print(wins[i][j], end="")
+                    print(end=" ")
+                print()
+                inp4 = int(input("Do you still want to find more? Press 0 to quit, or 1 to continue "))
+                if inp4 == 1:
+                    turtle.clearscreen()
+                    main()
+            else:
+                return y
+        inp = int(input("Do you want to find more? Press 0 to quit, 1 for yes, or 2 to view all your past winning sequences "))
+        print()
+        if inp == 1:
+            return patrick_pool(n, 1, wins)
+        if inp == 2:
+            for i in range(len(wins)):
+                for j in range(len(wins[i])):
+                    print(wins[i][j], end="")
+                print(end=" ")
+            print()
+            inp3 = int(input("Do you still want to find more? Press 0 to quit, or 1 to continue "))
+            if inp3 == 1:
+                return patrick_pool(n, 1, wins)
+        if inp == 0:
+            return y
+
+main()
+
